@@ -51,7 +51,7 @@ export default function LeftSidebar() {
                     ):(
                         albums.map((a)=>{
                             return(
-                                <Link to={`/album/${a._id}`} key={a._id} 
+                                <Link to={`/albums/${a._id}`} key={a._id} 
                                 className='p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer'>
                                     <img src={a.imageUrl} alt="" 
                                     className='size-12 rounded-md flex-shrink-0 object-center' />
