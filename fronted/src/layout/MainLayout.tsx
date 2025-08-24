@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../components/ui/resizable'
 import LeftSidebar from './components/LeftSidebar'
+import RigthFriendM from './components/RigthFriendM'
 export default function MainLayout() {
     const [mobile, setmobile] = useState(false)    
   return (
@@ -16,7 +17,7 @@ export default function MainLayout() {
             </ResizablePanel>
             <ResizableHandle className='w-2 bg-black rounded-lg transition-colors'></ResizableHandle>
             <ResizablePanel defaultSize={20} minSize={0} maxSize={25} collapsedSize={0}>
-                Frindes
+                <RigthFriendM/>
             </ResizablePanel>
         </ResizablePanelGroup>     
     </div>
