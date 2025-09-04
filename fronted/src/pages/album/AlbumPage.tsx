@@ -3,26 +3,41 @@ import { useParams } from 'react-router-dom'
 import { useMusicStore } from '../../store/useMusicStore'
 import { ScrollArea } from '../../components/ui/scroll-area'
 import { Button } from '../../components/ui/button'
-import { Clock, Play } from 'lucide-react'
-import { Table } from '../../components/ui/table'
+import { Clock, Music, Pause, Play } from 'lucide-react'
+import { usePlayerStore } from '../../store/usePlayerStore'
 
-export default function AlbumPage() {
-  const {albumID}=useParams()
-  const {fetchAbumsById,currentAlbum,isLoading}=useMusicStore()
-  
-  useEffect(()=>{
-    if(albumID) fetchAbumsById(albumID)
-  },[fetchAbumsById,albumID])
-  if(isLoading) return null
-  const formatDuration=(seg:number)=>{
+export const FormatDuration=(seg:number)=>{
     const minutes=Math.floor(seg / 60)
     const remainginSecons=seg % 60
     return `${minutes}:${remainginSecons.toString().padStart(2,"0")}`
   }
+export default function AlbumPage() {
+  const {albumID}=useParams()
+  const {fetchAbumsById,currentAlbum,isLoading}=useMusicStore()
+  const {currentSong,isPlaying,playAlbum,togglePlay}=usePlayerStore()
+  useEffect(()=>{
+    if(albumID) fetchAbumsById(albumID)
+  },[fetchAbumsById,albumID])
+  if(isLoading) return null
+  
+  const handleTooglePlay=()=>{
+    if(!currentAlbum)return;
+    const iscurrentalbum=currentAlbum?.songs.some(s=>s._id===currentSong?._id)
+    if(iscurrentalbum) togglePlay()
+    else{
+        playAlbum(currentAlbum?.songs,0)
+    }
+  }
+  const handlePlaySong=(index:number)=>{
+    if(!currentAlbum)return;
+    playAlbum(currentAlbum?.songs,index)
+
+  }
+  
   return (
    <>
    <div className="h-full ">
-    <ScrollArea className='h-full'>
+    <ScrollArea className='h-full rounded-md'>
         <div className='relative min-h-full'>
             <div className='absolute inset-0 bg-gradient-to-b from-[#5038a0]/80 via-zinc-900/80
             to-zinc-900 pointer-events-none'
@@ -50,9 +65,15 @@ export default function AlbumPage() {
                 </div>
                 {/*play button*/}
                 <div className='px-6 pb-4 flex items-center gap-6'>
-                    <Button size='icon'
+
+                    <Button  onClick={handleTooglePlay} size='icon'
                         className='w-14 h-14 rounded-full bg-green-500 hover:bg-green-400 hover:scale-105 transition-all'>
-                            <Play className='h-7 w-7 text-black'></Play>
+                            {isPlaying && currentAlbum?.songs.some(s=>s._id===currentSong?._id)?(
+                                <Pause className='h-7 w-7 text-black'></Pause>
+                            ):(
+                                <Play className='h-7 w-7 text-black'></Play>
+                                
+                            )}
                     </Button>
                 </div>
                 {/*Table */}
@@ -71,16 +92,25 @@ export default function AlbumPage() {
                         <div className='space-y-2 py-4'>
                             {
                                 currentAlbum?.songs.map((s,i)=>{
+                                    const iscurrentSong=currentSong?._id===s._id
                                     return(            
-                                        <div className='grid grid-cols-[16px_4fr_2fr_1fr] gap-4 px-4 py-2 text-sm 
+                                        <div  
+                                        onClick={()=>handlePlaySong(i)}
+                                        className='grid grid-cols-[16px_4fr_2fr_1fr] gap-4 px-4 py-2 text-sm 
                                         text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer'
                                          key={i}>
-                                            <div className='flex items-center justify-center'>
-                                                <span className='group-hover:hidden'>{i+1}</span>
-                                                <Play className='h-4 w-4 hidden group-hover:block'></Play>
+                                            <div  className='flex items-center justify-center'>
+                                               {iscurrentSong && isPlaying?(
+                                                <div className='size-4 text-green-500'><Music className='size-4'></Music></div>
+                                               ):(
+                                                 <span className='group-hover:hidden'>{i+1}</span>
+                                               )}
+                                                {!iscurrentSong&&(
+                                                    <Play className='h-4 w-4 hidden group-hover:block'></Play>
+                                                )}
                                             </div>
                                             <div className='flex items-center gap-3'>
-                                                <img src={`${s.imageUrl}`} className='size-10' alt="" />
+                                                <img src={`${s.imageURL}`} className='size-10' alt="" />                                                
                                                 <div>
                                                     <div className='font-medium text-white'>{s.title}</div>
                                                     <div>{s.artist}</div>
@@ -90,7 +120,7 @@ export default function AlbumPage() {
                                                 {s.createdAt.split("T")[0]}
                                             </div>
                                             <div className='flex items-center'>
-                                                {formatDuration(s.duration)}
+                                                {FormatDuration(s.duration)}
                                             </div>
                                         </div>
                                     )
