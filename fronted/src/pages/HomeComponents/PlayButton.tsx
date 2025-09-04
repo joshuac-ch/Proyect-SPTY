@@ -11,7 +11,7 @@ export default function PlayButton({song}:{song:Song}) {
         if(iscurrent)togglePlay()
         else setCurrentSong(song)
     }
-    return (
+    return (                 
    <>
    <Button 
    size={'icon'}
