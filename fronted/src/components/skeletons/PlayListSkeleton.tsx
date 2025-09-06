@@ -1,7 +1,7 @@
 import React from 'react'
 
 export default function PlayListSkeleton() {
-  return Array.from({length:7}).map((_,i)=>(
+  return Array.from({length:6}).map((_,i)=>(
     <div key={i} className='p-2 rounded-md flex items-center gap-3'>
         <div className="w-12 h-12 bg-zinc-800 rounded-lg flex-shrink-0 animate-pulse">           
         </div>
