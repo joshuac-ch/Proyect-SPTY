@@ -21,8 +21,8 @@ try{
                 _id:1,
                 title:1,
                 artist:1,
-                imageUrl:1,
-                audioUrl:1
+                imageURL:1,
+                audioURL:1
             }
         }
     ])
@@ -43,8 +43,8 @@ export const GetMadeForYou=async(req,res,next)=>{
                 _id:1,
                 title:1,
                 artist:1,
-                imageUrl:1,
-                audioUrl:1
+                imageURL:1,
+                audioURL:1
             }
         }
     ])
@@ -65,8 +65,8 @@ export const GetTendingSongs=async(req,res,next)=>{
                 _id:1,
                 title:1,
                 artist:1,
-                imageUrl:1,
-                audioUrl:1
+                imageURL:1,
+                audioURL:1
             }
         }
     ])
