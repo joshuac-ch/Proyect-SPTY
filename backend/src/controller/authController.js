@@ -1,12 +1,12 @@
 import { User } from '../models/userModel.js'
 export const AuthCall=async(req,res)=>{
     try{
-        const {id,FirstName,LastName,imageUrl}=req.body
-        const user=await User.findOne({clerkId:id}) 
+        const {id,firstName,lastName,imageUrl}=req.body
+        const user=await User.findOne({ClerkID:id}) 
         if(!user){
             await User.create({
-                clerkId:id,
-                FullName:`${FirstName} ${LastName}`,
+                ClerkID:id,
+                fullname:`${firstName} ${lastName}`,
                 imageUrl
             })
         }
