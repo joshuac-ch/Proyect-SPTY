@@ -16,17 +16,17 @@ export const uploadToCloudnary=async(file)=>{
         throw new Error(err.message)        
     }
 }
-export const createSong=async(req,res,next)=>{
+export const CreateSong=async(req,res,next)=>{
     try{
-        if(!req.files|| !req.files.audioFile||!res.files.imageFile){
-            return res.status(404).json({message:"POR FAVOR SUBIR UN FORMATO"})
-        }
-       
+        
+        if (!req.files || !req.files.audioFile || !req.files.imageFile) {
+            return res.status(400).json({ message: "POR FAVOR SUBIR UN FORMATO" });
+        }       
         const {title,artist,albumID,duration}=req.body
-        const {audioURL}=req.files.audioFile
-        const {imageURL}=req.files.imageURL //revisar esto
-         const audioFile=await uploadToCloudnary(audioFile)
-        const imageFile=await uploadToCloudnary(audioFile)
+        const audioFile=req.files.audioFile
+        const imageFile=req.files.imageFile 
+         const audioURL=await uploadToCloudnary(audioFile)
+        const imageURL=await uploadToCloudnary(imageFile)
         const song=new Song({
             title,
             artist,
@@ -37,7 +37,7 @@ export const createSong=async(req,res,next)=>{
         })
         await song.save()
         if(albumID){
-            await Album.findByIdUpdate(albumID,{
+            await Album.findByIdAndUpdate(albumID,{
                 $push:{
                     songs:song._id
                 }
@@ -75,7 +75,7 @@ export const createAlbum=async(req,res,next)=>{
             title,
             artist,
             releaseYear,
-            imageURL
+            imageUrl:imageURL
         })
         await album.save()
         res.status(200).json(album)
