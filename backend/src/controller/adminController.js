@@ -69,7 +69,7 @@ export const deleteSong=async(req,res,next)=>{
 export const createAlbum=async(req,res,next)=>{
     try{
         const {title,artist,releaseYear,songs}=req.body
-        const {imageFile}=req.files//asi debe ser imageFile o pude ser otro nombre probar
+        const {imageFile}=req.files
         const imageURL=await uploadToCloudnary(imageFile)
         const album=new Album({
             title,
