@@ -16,11 +16,11 @@ const AlbumSchema=mongoose.Schema({
         type:Number,
         required:true
     },
-    songs:{
+    songs:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Song",
         required:true
-    }
+    }]
 },{timestamps:true})
 /** @type {import("mongoose").Model<any>} */
 export const Album=mongoose.model("Album",AlbumSchema)
