@@ -10,5 +10,5 @@ const messageShema=mongoose.Schema({
         required:true
     }
 },{timestamps:true})
-
+/** @type {import("mongoose").Model<any>} */
 export const Message=mongoose.model("Message",messageShema)
