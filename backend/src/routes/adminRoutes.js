@@ -3,14 +3,14 @@
 //const { ProtectRute, requireAdmin } = require('../middleware/auth')
 import {Router} from "express"
 import { ProtectRute,requireAdmin } from '../middleware/auth.js'
-import { CheckAdmin, GetAdmin,createAlbum,createSong,deleteAlbum,deleteSong } from '../controller/adminController.js'
+import { CheckAdmin, CreateSong, GetAdmin,createAlbum,deleteAlbum,deleteSong } from '../controller/adminController.js'
 const router=Router()
-router.use(ProtectRute,requireAdmin)
+//router.use(ProtectRute,requireAdmin)
 router.get("/",GetAdmin)
 router.get("/check",CheckAdmin)
-router.post("/create-song",createSong)
+router.post("/c/song",CreateSong)
 router.delete("/delete/:id",deleteSong)
 router.post("/c/album",createAlbum)
-router.delete("d/album/:id",deleteAlbum)
+router.delete("/d/album/:id",deleteAlbum)
 
 export default router
