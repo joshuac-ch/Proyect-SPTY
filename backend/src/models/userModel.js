@@ -15,4 +15,5 @@ const userSchema=mongoose.Schema({
         unique:true
     }
 },{timestamps:true})
+/** @type {import("mongoose").Model<any>} */
 export const User=mongoose.model("User",userSchema)
