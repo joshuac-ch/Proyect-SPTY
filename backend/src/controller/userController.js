@@ -13,7 +13,7 @@ export const GetAllUsers=async(req,res,next)=>{
 }
 export const GetMessage=async(req,res,next)=>{
     try{
-        const myID=req.auth.userId 
+        const {userId:myID}=req.auth() 
         const {userID}=req.params
         const messages=await Message.find({
             $or:[
