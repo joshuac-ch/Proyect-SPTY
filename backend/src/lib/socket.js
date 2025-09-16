@@ -10,19 +10,21 @@ export const InitialSocket=(server)=>{
     const userSocket=new Map()
     const userActivitis=new Map()
     io.on('connection',(socket)=>{
+        console.log("cliente conectado",socket.id)
         socket.on('user_connected',(userID)=>{
             userSocket.set(userID,socket.id)
-            userActivitis.set(userID,"AoT")
+            userActivitis.set(userID,"Idle")
 
-            io.emit("user_connected",user)
+            io.emit("user_connected",userID)
 
             socket.emit("users_online",Array.from(userSocket.keys()))
 
-            io.emit("activities",Array.from(userActivitis.keys()))
+            io.emit("activities",Array.from(userActivitis.entries()))
         })
-        socket.on('update_activity',(userID,activity)=>{
+        socket.on('update_activity',({userID,activity})=>{
             userActivitis.set(userID,activity)
             io.emit('activity_updated',{userID,activity})
+            console.log(userActivitis)
         })
         socket.on("send_message",async(data)=>{
             try{
