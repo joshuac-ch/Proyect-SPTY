@@ -6,9 +6,9 @@ const router=Router()
 router.get("/",(req,res)=>{
     res.send("Welcome to Songs ")
 })
-router.use(ProtectRute)
+//router.use(ProtectRute)
 router.get("/g/songs",GetAllSongs)
-router.get("/g/songs/feature",GetFeatureSongs)
-router.get("/g/songs/made-for-you",GetMadeForYou)
-router.get("/g/songs/tending",GetTendingSongs)
+router.get("/g/features",GetFeatureSongs)
+router.get("/g/made-for-you",GetMadeForYou)
+router.get("/g/tendings",GetTendingSongs)
 export default router
