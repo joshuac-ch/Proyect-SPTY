@@ -9,7 +9,7 @@ const app=express()
 const port=process.env.PORT
 import { clerkMiddleware } from "@clerk/express"
 import fileUpload from "express-fileupload"
-
+import cors from "cors"
 //const useroutes=require("./routes/userRoutes")
 import userRoutes from './routes/userRoutes.js'
 //const adminroutes=require("./routes/adminRoutes")
@@ -24,7 +24,35 @@ import statsRoutes from './routes/statsRoutes.js'
 //const statsroutes=require("./routes/statsRoutes")
 //const path=require('path')
 import path from 'path'
+import { createServer } from "http"
+import { InitialSocket } from "./lib/socket.js"
 const __dirname=path.resolve()
+const httpserver=createServer(app)
+InitialSocket(httpserver)
+
+app.use(cors({
+    origin:["http://localhost:5173","http://192.168.18.28:5173"],
+    credentials:true
+}))
+
+//ponerlo aqui antes de todas mis rutas
+app.use(clerkMiddleware({
+     publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+    secretKey: process.env.CLERK_SECRET_KEY
+}))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+// 👇 Aquí va fileUpload ANTES de las rutas
+app.use(fileUpload({
+    useTempFiles:true,
+    tempFileDir:path.join(__dirname,"temp"),
+    createParentPath:true,
+    limits:{
+        fileSize:10*1024*1024 //max 10mb
+    }
+}))
+
+
 app.use("/api/users/",userRoutes)
 app.use("/api/admin/",adminRoutes)
 app.use("/api/auth/",authRoutes)
@@ -34,16 +62,9 @@ app.use("/api/stats/",statsRoutes)
 app.use((err,req,res,next)=>{
     res.status(500).json({message:process.env.NODE_ENV=="production"?"Error interno del servidor":err.message})
 })
-app.use(clerkMiddleware())
-app.use(fileUpload({
-    useTempFiles:true,
-    tempFileDir:path.join(__dirname,"temp"),
-    createParentPath:true,
-    limits:{
-        fileSize:10*1024*1024 //max 10mb
-    }
-}))
-app.listen(port,()=>{
+
+
+httpserver.listen(port,()=>{
     console.log(`Corriendo en el puerto http://localhost:${port}`)
     conectionMongo()
 })
