@@ -31,7 +31,7 @@ const httpserver=createServer(app)
 InitialSocket(httpserver)
 
 app.use(cors({
-    origin:["http://localhost:5173","http://192.168.18.28:5173"],
+    origin:[`http://${process.env.HOST}:5173`,`http://${process.env.HOST}:5173`],
     credentials:true
 }))
 
@@ -65,7 +65,7 @@ app.use((err,req,res,next)=>{
 
 
 httpserver.listen(port,()=>{
-    console.log(`Corriendo en el puerto http://localhost:${port}`)
+    console.log(`Corriendo en el puerto http://${process.env.HOST}:${port}`)
     conectionMongo()
 })
 //http://localhost:5000/api/admin/create-song

@@ -3,7 +3,7 @@ import { Message } from "../models/messageModel.js";
 export const InitialSocket=(server)=>{
     const io=new Server(server,{
         cors:{
-            origin:"http://localhost:5173",
+            origin:`http://${process.env.HOST}:5173`,
             credentials:true
         }
     })
