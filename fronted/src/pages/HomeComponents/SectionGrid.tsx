@@ -2,6 +2,7 @@
 import GridSkeleton from '../../components/skeletons/GridSkeleton'
 import { Button } from '../../components/ui/button'
 import type { Song } from '../../types'
+import PlayButton from './PlayButton'
 type GridPomps={
     title:string,
     songs:Song[],
@@ -29,9 +30,11 @@ export default function SectionGrid({title,songs,isLoading}:GridPomps) {
                                 className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ' 
                                 alt={s.title} />
                             </div>
+                             <PlayButton song={s}></PlayButton>
                         </div>
                         <h3 className='font-medium mb-2 '>{s.title}</h3>
                         <p className='text-sm text-zinc-400 '>{s.artist}</p>
+                       
                     </div>
                 )
             })}
