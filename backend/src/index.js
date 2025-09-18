@@ -31,7 +31,7 @@ const httpserver=createServer(app)
 InitialSocket(httpserver)
 
 app.use(cors({
-    origin:[`http://${process.env.HOST}:5173`,`http://${process.env.HOST}:5173`],
+    origin:[`http://${process.env.HOST}:5173`,`http://${process.env.HOST}:4173`,`http://${process.env.HOST}:5173`],
     credentials:true
 }))
 
