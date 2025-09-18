@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMusicStore } from '../../store/useMusicStore'
 import { ScrollArea } from '../../components/ui/scroll-area'

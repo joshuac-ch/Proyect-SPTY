@@ -11,7 +11,7 @@ export default function PlayBackControllers() {
     return `${minutes}:${remainginSecons.toString().padStart(2,"0")}`
   }
   const {isPlaying,togglePlay,playNext,playPrevious,currentSong}=usePlayerStore()
-  const [volumen, setvolumen] = useState(75)
+  const [volumen, setvolumen] = useState(50)
   const [currenTime, setcurrenTime] = useState(0)
   const [duration, setduration] = useState(0)
   const audioRef=useRef<HTMLAudioElement|null>(null)
