@@ -6,12 +6,12 @@ import { ScrollArea } from '../../components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 
 export default function RigthFriendM() {
-  const {users,isloadding,fechtUsers,error}=useChatStore()
+  const {users,fechtUsers,onlineUsers,userActivitys}=useChatStore()
   const {user}=useUser()
   useEffect(()=>{
    if(user) fechtUsers()
   },[fechtUsers,user])
-    const isplaying=true
+  
   return (
     <>
        <div className='h-full bg-zinc-900 rounded-lg flex flex-col'>
@@ -27,6 +27,8 @@ export default function RigthFriendM() {
         <ScrollArea className='flex-1'>
             <div className='p-4 space-y-4 '>
                 {users.map((u)=>{
+                    const activity=userActivitys.get(u.ClerkID)
+                    const isplaying=activity&&activity!=="Idle"
                     return(
                         <div className='cursor-pointer hover:bg-zinc-800/50 p-3 rounded-md transition-colors group' key={u._id}>
                             <div className='flex items-start gap-3 '>
@@ -36,8 +38,8 @@ export default function RigthFriendM() {
                                         <AvatarFallback>{u.fullname[0]}</AvatarFallback>
                                         
                                     </Avatar>
-                                    <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-zinc-900
-                                                    bg-zinc-500"
+                                    <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-zinc-900
+                                                    ${onlineUsers.has(u.ClerkID)?"bg-green-500":"bg-zinc-500"} `}
                                                     aria-hidden='true'></div>
                                 </div>
                                 {/*Nos quedamos aqui */}
@@ -52,13 +54,13 @@ export default function RigthFriendM() {
                                         (
                                             <div className="mt-1">
                                                 <div className='text-sm text-white font-medium truncate'>
-                                                    Viva la vida
+                                                  {activity.replace("Escuchando","").split(" by ")[0]}
                                                 </div>
-                                            <div className='text-xs text-zinc-400 truncate'>by Coldplay</div>
+                                            <div className='text-xs text-zinc-400 truncate'> {activity}</div>
                                             </div>
                                         )
                                         :(
-                                            <div className='mt-1 text-xs text-zinc-400'>Idle</div>
+                                            <div className='mt-1 text-xs text-zinc-400'>Ninguna Cancion</div>
                                         )
                                         }
                                     </div>                
