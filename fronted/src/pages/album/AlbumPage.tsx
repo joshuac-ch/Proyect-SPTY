@@ -58,7 +58,7 @@ export default function AlbumPage() {
                             
                             <span className='font-medium text-white'>{currentAlbum?.artist}</span>
                             <span className=''>{currentAlbum?.songs.length} songs</span>
-                            <span className=''>{currentAlbum?.realeaseYear}</span>
+                            <span className=''>{currentAlbum?.releaseYear}</span>
                             
                         </div>
                     </div>

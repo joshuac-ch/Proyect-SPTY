@@ -34,7 +34,7 @@ export default function AddDialogSongs() {
         const formData=new FormData()
         formData.append("title",newSong.title)
         formData.append("artist",newSong.artist)
-        formData.append("duration",newSong.duration)
+        formData.append("duration",String(newSong.duration))
         if(newSong.albumid && newSong.albumid!=="none"){
              formData.append("albumID",newSong.albumid)
         }

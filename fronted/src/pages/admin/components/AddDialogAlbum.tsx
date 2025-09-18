@@ -1,4 +1,4 @@
-import React, { useRef, useState,ChangeEvent } from 'react'
+import { useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from '../../../components/ui/dialog'
 import { Plus, Upload } from 'lucide-react'
 import { Button } from '../../../components/ui/button'
@@ -32,7 +32,7 @@ export default function AddDialogAlbum() {
         const formData = new FormData()
         formData.append("title",newAlbum.title)
         formData.append("artist",newAlbum.artist)
-        formData.append("releaseYear",newAlbum.releaseYear)
+        formData.append("releaseYear",String(newAlbum.releaseYear))
         formData.append("imageFile",imagefile)
         console.log([...formData.entries()]);
         await axiosInstance.post(`/admin/c/album`,formData,{

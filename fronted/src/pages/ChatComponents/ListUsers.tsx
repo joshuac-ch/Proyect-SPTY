@@ -26,7 +26,7 @@ export default function ListUsers() {
                           <AvatarFallback>{user.fullname[0]}</AvatarFallback>
                         </Avatar>
                         <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ring-2 ring-zinc-900
-                          ${onlineUsers.has(user.ClerkID)?"bg-green-500":"bg-zinc-500"}`}>
+                          ${onlineUsers.has(String(user.ClerkID))?"bg-green-500":"bg-zinc-500"}`}>
 
                         </div>
                       </div>

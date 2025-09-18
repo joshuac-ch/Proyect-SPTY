@@ -16,7 +16,7 @@ export default function ChatHeader() {
             <div>
                 <h2 className="font-medium">{selectUser?.fullname}</h2>
                 <p className='text-sm text-zinc-400'>
-                {onlineUsers.has(selectUser?.ClerkID)?"Online":"Ofline"}
+                {onlineUsers.has(String(selectUser?.ClerkID))?"Online":"Ofline"}
                 </p>
             </div>
             </div>

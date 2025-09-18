@@ -27,7 +27,7 @@ export default function RigthFriendM() {
         <ScrollArea className='flex-1'>
             <div className='p-4 space-y-4 '>
                 {users.map((u)=>{
-                    const activity=userActivitys.get(u.ClerkID)
+                    const activity=userActivitys.get(String(u.ClerkID))
                     const isplaying=activity&&activity!=="Idle"
                     return(
                         <div className='cursor-pointer hover:bg-zinc-800/50 p-3 rounded-md transition-colors group' key={u._id}>
@@ -39,7 +39,7 @@ export default function RigthFriendM() {
                                         
                                     </Avatar>
                                     <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-zinc-900
-                                                    ${onlineUsers.has(u.ClerkID)?"bg-green-500":"bg-zinc-500"} `}
+                                                    ${onlineUsers.has(String(u.ClerkID))?"bg-green-500":"bg-zinc-500"} `}
                                                     aria-hidden='true'></div>
                                 </div>
                                 {/*Nos quedamos aqui */}

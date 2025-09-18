@@ -12,7 +12,7 @@ export default function MessageInput() {
   const handleSend=()=>{
     
    
-    sendMessage(selectUser?.ClerkID,user.id,message.trim())
+    sendMessage(String(selectUser?.ClerkID),user.id,message.trim())
     setmessage("")
   }
     return (

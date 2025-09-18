@@ -26,7 +26,7 @@ export default function ChatPage() {
 
   useEffect(()=>{
     if(selectUser){
-      fecthMessage(selectUser.ClerkID)
+      fecthMessage(String(selectUser.ClerkID))
     }
   },[selectUser,fecthMessage])
   const NoConversationPlaceHolder=()=>(
@@ -53,7 +53,7 @@ export default function ChatPage() {
           {/*Messages*/}
           <ScrollArea className='h-[calc(100vh-340px)]'>
             <div className="p-4 space-y-4">
-              {messages.sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt))
+              {messages.sort((a,b)=>new Date(a.createdAt).getTime()-new Date(b.createdAt).getTime())
               .map((m)=>(
                 <div key={m._id} className={`flex items-start gap-3 ${m.senderID===user?.id?"flex-row-reverse":""}`} >
                   <Avatar className='size-8'>
