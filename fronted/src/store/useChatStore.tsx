@@ -21,7 +21,7 @@ interface ChatStore{
     fecthMessage:(userId:string)=>Promise<void>
     setSelectUser:(user:Users|null)=>void
 }
-const baseURL="http://13.222.174.90:5000"
+const baseURL="/socket"
 const socket=io(baseURL,{
     autoConnect:false,
     withCredentials:true
