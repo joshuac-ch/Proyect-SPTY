@@ -1,5 +1,6 @@
 import {create} from "zustand"
 import type { Song } from "../types"
+import { useChatStore } from "./useChatStore"
 interface PlayerStore{
     currentSong:Song|null
     isPlaying:boolean
@@ -27,17 +28,32 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
     playAlbum:(songs:Song[],startIndex=0)=>{
         if(songs.length===0) return;
         const song=songs[startIndex]
+        const sokect=useChatStore.getState().socket
+        if(sokect.auth){
+            sokect.emit("update_activity",{
+                userID:sokect.auth.userId,
+                activity:`Escuchando ${song.title} by ${song.artist}`
+            })
+        }
         set({
             queue:songs,
             currentSong:song,
             currenIndex:startIndex,
             isPlaying:true
         }) 
+
     },
     setCurrentSong:(song:Song|null)=>{
         if(!song)return;
         const songIndex=get().queue.findIndex((s)=>s._id===song._id)
-        set({
+        const sokect=useChatStore.getState().socket
+        if(sokect.auth){
+            sokect.emit("update_activity",{
+                userID:sokect.auth.userId,
+                activity:`Escuchando ${song.title} by ${song.artist}`
+            })
+        }
+        set({    
             currentSong:song,
             isPlaying:true,
             currenIndex:songIndex!==-1 ? songIndex : get().currenIndex            
@@ -45,6 +61,14 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
     },
     togglePlay:()=>{
         const startplay=!get().isPlaying
+        const currentSong=get().currentSong
+        const sokect=useChatStore.getState().socket
+        if(sokect.auth){
+            sokect.emit("update_activity",{
+                userID:sokect.auth.userId,
+                activity:startplay && currentSong? `Escuchando ${currentSong.title} by ${currentSong.artist}`:"Idle"
+            })
+        }
         set({isPlaying:startplay})
     },
     playNext:()=>{
@@ -52,6 +76,13 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
         const nextIndex=currenIndex+1
         if(nextIndex<queue.length){
             const nextSong=queue[nextIndex]
+            const sokect=useChatStore.getState().socket
+            if(sokect.auth){
+                sokect.emit("update_activity",{
+                    userID:sokect.auth.userId,
+                    activity:`Escuchando ${nextSong.title} by ${nextSong.artist}`
+                })
+            }
             set({                
                 currentSong:nextSong,
                 currenIndex:nextIndex,
@@ -61,6 +92,13 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
             set({
                 isPlaying:false
             })
+            const sokect=useChatStore.getState().socket
+            if(sokect.auth){
+                sokect.emit("update_activity",{
+                    userID:sokect.auth.userId,
+                    activity:`Ninguna`
+                })
+            }
         }
     },
     playPrevious:()=>{
@@ -68,6 +106,13 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
         const preIndex=currenIndex-1
         if(preIndex>=0){
             const preSong=queue[preIndex]
+            const sokect=useChatStore.getState().socket
+            if(sokect.auth){
+                sokect.emit("update_activity",{
+                    userID:sokect.auth.userId,
+                    activity:`Escuchando ${preSong.title} by ${preSong.artist}`
+                })
+            }
             set({
                 currenIndex:preIndex,
                 currentSong:preSong,
@@ -75,6 +120,13 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
             })
         }else{
             set({isPlaying:false})
+            const sokect=useChatStore.getState().socket
+            if(sokect.auth){
+                sokect.emit("update_activity",{
+                    userID:sokect.auth.userId,
+                    activity:`Ninguna`
+                })
+            }
         }
     }
 }))

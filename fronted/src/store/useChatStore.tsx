@@ -11,14 +11,17 @@ interface ChatStore{
     socket:any,
     onlineUsers:Set<string>,
     userActivitys:Map<string,string>
-    messages:Message[]
+    messages:Message[],
 
-    initialSocket:(userid:string)=>void
+    selectUser:Users|null,
+
+    initialSocket:(userId:string)=>void
     disconectSocket:()=>void
     sendMessage:(recivedID:string,senderID:string,content:string)=>void
-
+    fecthMessage:(userId:string)=>Promise<void>
+    setSelectUser:(user:Users|null)=>void
 }
-const baseURL="http://localhost:5173/"
+const baseURL="http://localhost:5000"
 const socket=io(baseURL,{
     autoConnect:false,
     withCredentials:true
@@ -27,11 +30,13 @@ export const useChatStore=create<ChatStore>((set,get)=>({
     users:[],
     isloadding:false,
     error:null,
-    socket:null,
+    socket:socket,
     isConected:false,
     onlineUsers:new Set(),
     userActivitys:new Map(),
     messages:[],
+    selectUser:null,
+    setSelectUser:(user)=>set({selectUser:user}),
     fechtUsers:async()=>{
         set({isloadding:true,error:null})
     try {
@@ -44,16 +49,17 @@ export const useChatStore=create<ChatStore>((set,get)=>({
         set({isloadding:false})
     }
     },
-    initialSocket:(userid:string)=>{
+    initialSocket:(userId:string)=>{
         if(!get().isConected){
+            socket.auth={userId}
             socket.connect()
-            socket.emit("user_connected",userid)
-            socket.on("user_online",(users:string[])=>{
+            socket.emit("user_connected",userId)
+            socket.on("users_online",(users:string[])=>{
                 set({onlineUsers:new Set(users)})
             })
             
-            socket.on("activities",(acti:[string,string][])=>{
-                set({userActivitys:new Map(acti)})
+            socket.on("activities",(userID:[string,string][])=>{
+                set({userActivitys:new Map(userID)})
             })
 
             socket.on("user_connected",(users:string)=>{
@@ -62,21 +68,21 @@ export const useChatStore=create<ChatStore>((set,get)=>({
                 }))
             })
 
-            socket.on("disconnect",(userID:string)=>{
+            socket.on("disconnect",(userId:string)=>{
                 set((s)=>{
                     const newOnlineUsers=new Set(s.onlineUsers)
-                    newOnlineUsers.delete(userID)
+                    newOnlineUsers.delete(userId)
                     return {onlineUsers:newOnlineUsers}
                 })
             })
 
-            socket.on("receive_message",(message:Message)=>{
+            socket.on("message_recived",(message:Message)=>{
                 set((s)=>({
                     messages:[...s.messages,message]
                 }))
             })
 
-            socket.on("message_sent",(message:Message)=>{
+            socket.on("message_send",(message:Message)=>{
                 set((s)=>({
                     messages:[...s.messages,message]
                 }))
@@ -92,6 +98,27 @@ export const useChatStore=create<ChatStore>((set,get)=>({
             set({isConected:true})
         }
     },
-    disconectSocket:()=>{},
-    sendMessage:()=>{}
+    disconectSocket:()=>{
+        if(get().isConected){
+        socket.disconnect()
+        set({isConected:false})
+    }
+    },
+    //segur con esto mñn
+    sendMessage:async(recivedID,senderID,content)=>{
+        const socket=get().socket
+        if(!socket)return;
+        socket.emit("send_message",{recivedID,senderID,content})
+    },
+    fecthMessage:async(userId:string)=>{
+        set({isloadding:true,error:null})
+        try{
+            const {data}=await axiosInstance.get(`/users/message/${userId}`)
+            set({messages:data}) 
+        }catch(err:any){
+            set({error:err})
+        }finally{
+            set({isloadding:false})
+        }
+    }
 }))

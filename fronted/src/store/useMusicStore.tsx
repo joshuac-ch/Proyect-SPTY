@@ -2,6 +2,7 @@
 import { create } from 'zustand'
 import { axiosInstance } from '../lib/axios'
 import type { Album, Song, Stats } from '../types';
+import toast from 'react-hot-toast';
 interface MusicStore{
     songs:Song[]
     albums:Album[]
@@ -21,6 +22,8 @@ interface MusicStore{
     fectchTrendingSongs:()=>Promise<void>
     fecthSong:()=>Promise<void>
     fecthStat:()=>Promise<void>
+    deleteSong:(id:string)=>Promise<void>
+    deleteAlbum:(id:string)=>Promise<void>
 }
 export const useMusicStore=create<MusicStore>((set)=>({
   albums:[],
@@ -30,12 +33,42 @@ export const useMusicStore=create<MusicStore>((set)=>({
   currentAlbum:null,
   madeForYouSongs:[],
   trendingForYouSongs:[],
-  featuredSongs:[],
+  featuredSongs:[],  
   stats:{
     totalAlbums:0,
-    totalSongs:0,
-    totalUser:0,
+    totalSonsg:0,
+    totalUsers:0,
     totalArtist:0
+  },
+  deleteAlbum:async(id)=>{
+    set({error:null,isLoading:true})
+    try{
+        await axiosInstance.delete(`/admin/d/album/${id}`)
+        set(state=>({
+            albums:state.albums.filter(a=>a._id!=id)
+        }))
+        toast.success("Se elimino el album")
+    }catch(err:any){
+        toast.error("No se pudo eliminar el album")
+        set({error:err})
+    }finally{
+        set({isLoading:false})
+    }
+  },
+  deleteSong:async(id)=>{
+    set({error:null,isLoading:true})
+    try{
+        await axiosInstance.delete(`/admin/delete/${id}`)
+        set(state=>({
+            songs:state.songs.filter(song=>song._id!=id)
+        }))
+        toast.success("Se elimino la cancion")
+    }catch(err:any){
+        toast.error("Hubo un error al eliminar la cancion")
+        set({error:err})
+    }finally{
+        set({isLoading:false})
+    }
   },
   fetchFeatureSongs:async()=>{
     set({isLoading:true,error:null})
@@ -70,6 +103,7 @@ export const useMusicStore=create<MusicStore>((set)=>({
         set({isLoading:false})
     }
   },
+  
   fetchAlbums: async()=>{
     set({isLoading:true,error:null})
     try{
@@ -97,7 +131,7 @@ export const useMusicStore=create<MusicStore>((set)=>({
         set({isLoading:true,error:null})
         try{
             const {data}=await axiosInstance.get(`/song/g/songs`)
-            set({songs:data})
+            set({songs:data.modelo})
         }catch(err:any){
             set({error:err})
         }finally{
