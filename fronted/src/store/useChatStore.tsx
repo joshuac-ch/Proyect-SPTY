@@ -23,7 +23,7 @@ interface ChatStore{
 }
 const baseURL="http://3.87.87.124"
 const socket=io(baseURL,{
-    path:"/socket.io/",
+    path:"/socket.io",
     autoConnect:false,
     withCredentials:true,
     transports:["websocket"]
