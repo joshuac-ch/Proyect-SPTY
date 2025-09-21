@@ -1,12 +1,17 @@
 import { Server } from "socket.io";
 import { Message } from "../models/messageModel.js";
 export const InitialSocket=(server)=>{
-    const io=new Server(server,{
-        cors:{
-            origin:`http://${process.env.HOST}:4173`,
-            credentials:true
+    const io=new Server(server,
+        {
+            path:"/socket.io"
         }
-    })
+        //{
+        //cors:{
+        //    origin:`http://${process.env.HOST}:4173`,
+        //    credentials:true
+        //}
+        //}
+)
     const userSocket=new Map()
     const userActivitis=new Map()
     io.on('connection',(socket)=>{
