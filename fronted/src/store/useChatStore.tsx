@@ -21,10 +21,12 @@ interface ChatStore{
     fecthMessage:(userId:string)=>Promise<void>
     setSelectUser:(user:Users|null)=>void
 }
-const baseURL="/socket"
+const baseURL="http://3.87.87.124"
 const socket=io(baseURL,{
+    path:"/socket.io/",
     autoConnect:false,
-    withCredentials:true
+    withCredentials:true,
+    transports:["websocket"]
 })
 export const useChatStore=create<ChatStore>((set,get)=>({
     users:[],
