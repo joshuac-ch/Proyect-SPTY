@@ -16,16 +16,29 @@ export const uploadToCloudnary=async(file)=>{
         throw new Error(err.message)        
     }
 }
+export const ShowSong=async(req,res,next)=>{
+    try{
+        const {id}=req.params
+        const cancion=await Song.findById(id)
+        if(!cancion){
+            return res.status(404).json({message:"No se encontro la cancion"})
+        }
+        res.status(200).json(cancion)
+    }catch(err){
+        console.error(err.message)
+        next(err)
+    }
+}
 export const CreateSong=async(req,res,next)=>{
     try{
         
         if (!req.files || !req.files.audioFile || !req.files.imageFile) {
             return res.status(400).json({ message: "POR FAVOR SUBIR UN FORMATO" });
         }       
-        const {title,artist,albumID,duration}=req.body
+        const {title,artist,albumID,duration,plays,genero,releaseYear,tags,mood}=req.body
         const audioFile=req.files.audioFile
         const imageFile=req.files.imageFile 
-         const audioURL=await uploadToCloudnary(audioFile)
+        const audioURL=await uploadToCloudnary(audioFile)
         const imageURL=await uploadToCloudnary(imageFile)
         const song=new Song({
             title,
@@ -33,7 +46,13 @@ export const CreateSong=async(req,res,next)=>{
             albumID:albumID||null,
             duration,
             audioURL,
-            imageURL
+            imageURL,
+            plays,
+            genero,
+            releaseYear,
+            tags,
+            mood,
+
         })
         await song.save()
         if(albumID){
@@ -46,6 +65,34 @@ export const CreateSong=async(req,res,next)=>{
         res.status(200).json({messaga:"se creo la cancion"})
     }catch(err){
         console.error(err.message)
+        next(err)
+    }
+}
+export const EditSong=async(req,res,next)=>{
+    try{
+        const {id}=req.params
+        const {title,artist,albumID,duration,plays,genero,releaseYear,tags,mood}=req.body
+        const song = await Song.findById(id)
+        if (!song) return res.status(404).json("Canción no encontrada")
+        const audioFile=req.files?.audioFile
+        const imageFile=req.files?.imageFile
+        if(!title||!artist||!genero||!releaseYear||!tags||!mood){
+            return res.status(404).json("No se llenaron los datos")
+        }
+        const audioURL = audioFile ? await uploadToCloudnary(audioFile) : song.audioURL;
+        const imageURL = imageFile ? await uploadToCloudnary(imageFile) : song.imageURL;
+
+        const form={
+           title,artist,albumID,duration,plays,genero,releaseYear,tags,mood,audioURL,imageURL
+        }
+        const song1=await Song.findByIdAndUpdate(id,form,{
+            new:true,
+            runValidators:true
+        })
+        res.status(200).json(song1) 
+
+    }catch(err){
+        console.error(err)
         next(err)
     }
 }
