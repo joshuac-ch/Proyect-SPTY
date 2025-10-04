@@ -19,9 +19,9 @@ export const InitialSocket=(server)=>{
         socket.on('user_connected',(userID)=>{
             userSocket.set(userID,socket.id)
             userActivitis.set(userID,"Idle")
-
+            //lo comparte para todos
             io.emit("user_connected",userID)
-
+            //lo envcia al cliente actual 
             socket.emit("users_online",Array.from(userSocket.keys()))
 
             io.emit("activities",Array.from(userActivitis.entries()))
