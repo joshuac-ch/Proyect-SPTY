@@ -31,12 +31,12 @@ export default function HomePage() {
     <TopBar></TopBar>
    <ScrollArea className="h-[calc(100vh-180px)]">
     <div className="p-4 sm:p-6">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6">Good Afternoon</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6">Buenas Tardes</h1>
      <SectionFeatured></SectionFeatured>
     
     <div className="space-y-8">
-      <SectionGrid title={"Made for you"} songs={madeForYouSongs} isLoading={isLoading}></SectionGrid>
-      <SectionGrid title={"Trending"} songs={trendingForYouSongs} isLoading={isLoading}></SectionGrid>      
+      <SectionGrid title={"Para ti"} songs={madeForYouSongs} isLoading={isLoading}></SectionGrid>
+      <SectionGrid title={"Tendencias"} songs={trendingForYouSongs} isLoading={isLoading}></SectionGrid>      
     </div>
     </div>
    </ScrollArea>
