@@ -1,3 +1,4 @@
+import { Reproducciones } from "../models/reproduccionesModel.js"
 import { Song } from "../models/songModel.js"
 
 export const GetAllSongs=async(req,res,next)=>{
@@ -56,21 +57,38 @@ export const GetMadeForYou=async(req,res,next)=>{
 }
 export const GetTendingSongs=async(req,res,next)=>{
     try{
-         const songs=await Song.aggregate([
-        {
-            $sample:{size:4}
-        },
-        {
-            $project:{
-                _id:1,
-                title:1,
-                artist:1,
-                imageURL:1,
-                audioURL:1
+        const tendencias=await Reproducciones.aggregate([
+            {
+                $group:{
+                    _id:"$song_ID",
+                    total_plays:{$sum:"$plays"}
+                }
+            },
+            {$sort:{total_plays:-1}},
+            {$limit:4},
+            {
+                $lookup:{
+                    from:"songs",
+                    localField:"_id",
+                    foreignField:"_id",
+                    as:"song"
+                    
+                }
+            },
+            {$unwind:"$song"},
+            {
+                $project:{
+                    _id:"$song._id",
+                    title:"$song.title",
+                    artist:"$song.artist",
+                    imageURL:"$song.imageURL",
+                    audioURL:"$song.audioURL",
+                    total_plays:1
+                }
             }
-        }
-    ])
-    res.json(songs)
+        ])
+        
+    res.json(tendencias)
     }catch(err){
         console.error(err.message)
         next(err)
