@@ -17,7 +17,12 @@ export default function AddDialogSongs() {
     title:"",
     artist:"",
     duration:0,
-    albumid:""
+    albumID:"",
+    genero:"",
+    releaseYear:"",
+    tags:"",
+    mood:""
+
   })
   const [files, setfiles] = useState<{audio:File|null,image:File|null}>({
     audio:null,
@@ -35,11 +40,15 @@ export default function AddDialogSongs() {
         formData.append("title",newSong.title)
         formData.append("artist",newSong.artist)
         formData.append("duration",String(newSong.duration))
-        if(newSong.albumid && newSong.albumid!=="none"){
-             formData.append("albumID",newSong.albumid)
+        if(newSong.albumID && newSong.albumID!=="none"){
+             formData.append("albumID",newSong.albumID)
         }
         formData.append("audioFile", files.audio)
         formData.append("imageFile", files.image)
+        formData.append("releaseYear",newSong.releaseYear)
+        formData.append("genero",newSong.genero)
+        formData.append("tags",newSong.tags)
+        formData.append("mood",newSong.mood)
         console.log([...formData.entries()]);
         await axiosInstance.post("/admin/c/song",formData,{
             headers:{
@@ -48,9 +57,13 @@ export default function AddDialogSongs() {
         })
         setnewSong({
             title:"",
-            albumid:"",
+            albumID:"",
             artist:"",
-            duration:0
+            duration:0,
+            genero:"",
+            releaseYear:"",
+            tags:"",
+            mood:""
         })
         setfiles({
             audio:null,
@@ -139,11 +152,40 @@ export default function AddDialogSongs() {
                      className='bg-zinc-800 border-zinc-700'    
                     ></Input>
                 </div>
+                
+                <div className="space-y-2">
+                    <label htmlFor="" className='text-sm font-medium'>Genero</label>
+                    <Input type='text' min={0} value={newSong.genero} onChange={(e)=>setnewSong({...newSong,genero: e.target.value})}
+                     className='bg-zinc-800 border-zinc-700'    
+                    ></Input>
+                </div>
+
+                <div className="space-y-2">
+                    <label htmlFor="" className='text-sm font-medium'>Año Emitido</label>
+                    <Input type='number' min={0} value={newSong.releaseYear} onChange={(e)=>setnewSong({...newSong,releaseYear: parseInt(e.target.value)})}
+                     className='bg-zinc-800 border-zinc-700'    
+                    ></Input>
+                </div>
+
+                <div className="space-y-2">
+                    <label  className='text-sm font-medium'>Etiquetas</label>
+                    <Input type='text' min={0} value={newSong.tags} onChange={(e)=>setnewSong({...newSong,tags: e.target.value})}
+                     className='bg-zinc-800 border-zinc-700'    
+                    ></Input>
+                </div>
+
                  <div className="space-y-2">
-                    <label htmlFor="" className='text-sm font-medium'>Album ID (opcional)</label>
+                    <label  className='text-sm font-medium'>Mood</label>
+                    <Input type='text' min={0} value={newSong.mood} onChange={(e)=>setnewSong({...newSong,mood: e.target.value})}
+                     className='bg-zinc-800 border-zinc-700'    
+                    ></Input>
+                </div>
+
+                 <div className="space-y-2">
+                    <label  className='text-sm font-medium'>Album ID (opcional)</label>
                     <Select
-                     value={newSong.albumid}
-                     onValueChange={(v)=>setnewSong({...newSong,albumid:v})}>
+                     value={newSong.albumID}
+                     onValueChange={(v)=>setnewSong({...newSong,albumID:v})}>
                         <SelectTrigger className='bg-zinc-800 border-zinc-700'>
                             <SelectValue placeholder='Seleccionar Album'></SelectValue>
                         </SelectTrigger>
