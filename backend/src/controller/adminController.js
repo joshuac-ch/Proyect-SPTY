@@ -2,6 +2,7 @@
 import { Album } from "../models/albumModel.js"
 import { Song } from "../models/songModel.js"
 import cloudnary from "../lib/cloudnary.js"
+import { Reproducciones } from "../models/reproduccionesModel.js"
 
 export const GetAdmin=(req,res)=>{
     res.send("Welcome to Admin ")
@@ -76,7 +77,7 @@ export const EditSong=async(req,res,next)=>{
         if (!song) return res.status(404).json("Canción no encontrada")
         const audioFile=req.files?.audioFile
         const imageFile=req.files?.imageFile
-        if(!title||!artist||!genero||!releaseYear||!tags||!mood){
+        if(!title||!artist||!genero||!releaseYear||!tags||!mood ){
             return res.status(404).json("No se llenaron los datos")
         }
         const audioURL = audioFile ? await uploadToCloudnary(audioFile) : song.audioURL;
@@ -85,16 +86,62 @@ export const EditSong=async(req,res,next)=>{
         const form={
            title,artist,albumID,duration,plays,genero,releaseYear,tags,mood,audioURL,imageURL
         }
-        const song1=await Song.findByIdAndUpdate(id,form,{
+        
+        const updateSong=await Song.findByIdAndUpdate(id,form,{
             new:true,
             runValidators:true
         })
-        res.status(200).json(song1) 
+        // 2️⃣ Si cambió el álbum, actualiza la relación
+        if (albumID && song.albumID?.toString() !== albumID) {
+        // - Quita la canción del álbum anterior (si tenía uno)TENER EN CUENTAS ESTO
+        if (song.albumID) {
+            await Album.findByIdAndUpdate(song.albumID, {
+            $pull: { songs: song._id },
+            });
+        }
 
+        // - Agrega la canción al nuevo álbum
+        await Album.findByIdAndUpdate(albumID, {
+            $addToSet: { songs: song._id }, // addToSet evita duplicados
+        });
+        }
+        res.status(200).json(updateSong) 
+        
     }catch(err){
         console.error(err)
         next(err)
     }
+}
+export const PlaySong=async(req,res,next)=>{
+    try{
+        
+        const {user_ID,song_ID,liked}=req.body
+        
+        let reproducir=await Reproducciones.findOne({user_ID,song_ID})
+        if(reproducir){
+            reproducir.plays+=1
+            reproducir.lastPlayedAt=new Date()
+            if(liked!==undefined) reproducir.liked=liked
+        }
+        else{
+            reproducir=new Reproducciones({
+            user_ID,
+            song_ID,
+            plays:1,
+            liked:liked||false,
+            lastPlayedAt:new Date(),
+            firstPlayedAt:new Date()
+                
+        })
+        
+        }
+        await reproducir.save()
+        res.status(200).json(reproducir)
+    }catch(err){
+        console.error(err)
+        next(err)
+    }
+
 }
 export const deleteSong=async(req,res,next)=>{
     try{    
