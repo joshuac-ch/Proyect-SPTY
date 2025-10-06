@@ -15,6 +15,9 @@ interface MusicStore{
     //
     stats:Stats
     //
+    fecthShowSong:(id:string)=>Promise<void>;
+    song:Song[]
+    
     fetchAlbums:()=>Promise<void>;
     fetchAbumsById:(id:string)=>Promise<void>;
     fetchFeatureSongs:()=>Promise<void>
@@ -24,10 +27,12 @@ interface MusicStore{
     fecthStat:()=>Promise<void>
     deleteSong:(id:string)=>Promise<void>
     deleteAlbum:(id:string)=>Promise<void>
+    
 }
 export const useMusicStore=create<MusicStore>((set)=>({
   albums:[],
   songs:[],
+  song:[],
   isLoading:false,
   error: null,
   currentAlbum:null,
@@ -39,6 +44,17 @@ export const useMusicStore=create<MusicStore>((set)=>({
     totalSonsg:0,
     totalUsers:0,
     totalArtist:0
+  },
+  fecthShowSong:async(id)=>{
+    set({error:null,isLoading:true})
+    try{
+        const response=await axiosInstance.get(`/song/s/${id}`)
+        set({song:response.data})
+    }catch(err:any){
+        set({error:err})
+    }finally{
+        set({isLoading:false})
+    }
   },
   deleteAlbum:async(id)=>{
     set({error:null,isLoading:true})
