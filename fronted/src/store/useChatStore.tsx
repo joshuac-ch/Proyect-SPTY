@@ -1,6 +1,6 @@
 import {create} from "zustand"
 import { axiosInstance } from "../lib/axios";
-import type { Message, Users } from "../types";
+import type { Message, Song, Users } from "../types";
 import {io} from "socket.io-client"
 interface ChatStore{
     users:Users[];
@@ -12,7 +12,7 @@ interface ChatStore{
     onlineUsers:Set<string>,
     userActivitys:Map<string,string>
     messages:Message[],
-
+    songData:null,
     selectUser:Users|null,
 
     initialSocket:(userId:string)=>void
@@ -21,7 +21,14 @@ interface ChatStore{
     fecthMessage:(userId:string)=>Promise<void>
     setSelectUser:(user:Users|null)=>void
 }
-const baseURL="http://3.87.87.124"
+//para aws const baseURL="http://3.87.87.124"
+//const socket=io(baseURL,{
+//    path:"/socket.io",
+//    autoConnect:false,
+//    withCredentials:true,
+//    transports:["websocket"]
+//})
+const baseURL="localhost:5000"
 const socket=io(baseURL,{
     path:"/socket.io",
     autoConnect:false,
@@ -36,6 +43,7 @@ export const useChatStore=create<ChatStore>((set,get)=>({
     isConected:false,
     onlineUsers:new Set(),
     userActivitys:new Map(),
+    songData:null,
     messages:[],
     selectUser:null,
     setSelectUser:(user)=>set({selectUser:user}),
@@ -89,7 +97,10 @@ export const useChatStore=create<ChatStore>((set,get)=>({
                     messages:[...s.messages,message]
                 }))
             })
-
+            socket.on("song-playing",(song)=>{
+                
+                set({songData:song})
+            })
             socket.on('activity_updated',({userID,activity})=>{
                 set((s)=>{
                     const newActivities=new Map(s.userActivitys)
