@@ -21,15 +21,18 @@ export default function AddDialogSongs() {
     genero:"",
     releaseYear:"",
     tags:"",
-    mood:""
+    mood:"",
+    videoURL:""
 
   })
-  const [files, setfiles] = useState<{audio:File|null,image:File|null}>({
+  const [files, setfiles] = useState<{audio:File|null,image:File|null,video:File|null}>({
     audio:null,
-    image:null
+    image:null,
+    video:null
   }) 
   const audioInputRef=useRef<HTMLInputElement>(null)
   const imageInputRef=useRef<HTMLInputElement>(null)
+  const videoInputRef=useRef<HTMLInputElement>(null)
   const handleSubmit=async()=>{
     setisLoading(true)
     try {
@@ -43,6 +46,7 @@ export default function AddDialogSongs() {
         if(newSong.albumID && newSong.albumID!=="none"){
              formData.append("albumID",newSong.albumID)
         }
+        formData.append("videoFile",files.video)
         formData.append("audioFile", files.audio)
         formData.append("imageFile", files.image)
         formData.append("releaseYear",newSong.releaseYear)
@@ -63,11 +67,13 @@ export default function AddDialogSongs() {
             genero:"",
             releaseYear:"",
             tags:"",
-            mood:""
+            mood:"",
+            videoURL:""
         })
         setfiles({
             audio:null,
-            image:null
+            image:null,
+            video:null
         })
         toast.success("Se agrego la nueva cancion")
     } catch (error) {
@@ -96,6 +102,11 @@ export default function AddDialogSongs() {
                  ref={audioInputRef}
                  hidden 
                  onChange={(e)=>setfiles((prev)=>({...prev,audio:e.target.files![0]}))} />
+                
+                <input type="file" accept='video/*'
+                 ref={videoInputRef}
+                 hidden 
+                 onChange={(e)=>setfiles((prev)=>({...prev,video:e.target.files![0]}))} />
             
                 <input type="file" accept='image/*'
                  ref={imageInputRef} 
@@ -125,6 +136,30 @@ export default function AddDialogSongs() {
                         )}
                     </div>
                 </div>
+                {/*Diseño Video */}
+                <div 
+                className="flex items-center justify-center p-6 border-2 border-dashed border-zinc-700 rounded-lg cursor-pointer"
+                onClick={()=>videoInputRef.current?.click()}>
+                    <div className="text-center">
+                        {files.video?(
+                            <div className="space-y-2">
+                                <div className="text-sm text-emerald-500">Video Seleccionada: </div>
+                                <div className="text-xs text-zinc-400">{files.video.name.slice(0,20)}</div>
+                            </div>
+                        ):(
+                           <>
+                             <div className="p-3 bg-zinc-800 rounded-full inline-block mb-2">
+                                 <Upload className='w-6 h-6 text-zinc-400'></Upload>
+                             </div>
+                             <div className='text-sm text-zinc-400 mb-2'>Actualizar Video</div>
+                             <Button variant={'outline'} size={'sm'} className='text-xs'>
+                                Seleccionar Video
+                             </Button>
+                           </>
+                        )}
+                    </div>
+                </div>        
+
                 {/*Diseño de audio */}
                 <div className="space-y-2">
                     <label htmlFor="" className='text-sm font-medium'>Audio File</label>
