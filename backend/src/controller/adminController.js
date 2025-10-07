@@ -10,8 +10,9 @@ export const GetAdmin=(req,res)=>{
 export const uploadToCloudnary=async(file)=>{
     try{
         const resul=await cloudnary.uploader.upload(file.tempFilePath,{
-            resource_type:"auto"
+            resource_type:"video"
         })
+        
         return resul.secure_url
     }catch(err){
         throw new Error(err.message)        
@@ -41,6 +42,11 @@ export const CreateSong=async(req,res,next)=>{
         const imageFile=req.files.imageFile 
         const audioURL=await uploadToCloudnary(audioFile)
         const imageURL=await uploadToCloudnary(imageFile)
+        // Subir video solo si se envió
+        let videoURL=null
+        if(req.files.videoFile){
+            videoURL=await uploadToCloudnary(req.files.videoFile)
+        }
         const song=new Song({
             title,
             artist,
@@ -53,6 +59,7 @@ export const CreateSong=async(req,res,next)=>{
             releaseYear,
             tags,
             mood,
+            videoURL
 
         })
         await song.save()
@@ -77,14 +84,17 @@ export const EditSong=async(req,res,next)=>{
         if (!song) return res.status(404).json("Canción no encontrada")
         const audioFile=req.files?.audioFile
         const imageFile=req.files?.imageFile
+        let videoURL=null 
         if(!title||!artist||!genero||!releaseYear||!tags||!mood ){
             return res.status(404).json("No se llenaron los datos")
         }
         const audioURL = audioFile ? await uploadToCloudnary(audioFile) : song.audioURL;
         const imageURL = imageFile ? await uploadToCloudnary(imageFile) : song.imageURL;
-
+        if(req.files?.videoFile){
+            videoURL=await uploadToCloudnary(req.files?.videoFile)  
+        }
         const form={
-           title,artist,albumID,duration,plays,genero,releaseYear,tags,mood,audioURL,imageURL
+           title,artist,albumID,duration,plays,genero,releaseYear,tags,mood,audioURL,imageURL,videoURL
         }
         
         const updateSong=await Song.findByIdAndUpdate(id,form,{
