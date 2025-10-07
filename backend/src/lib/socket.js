@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import { Message } from "../models/messageModel.js";
+import { Song } from "../models/songModel.js";
 export const InitialSocket=(server)=>{
     const io=new Server(server,
         {
@@ -25,6 +26,12 @@ export const InitialSocket=(server)=>{
             socket.emit("users_online",Array.from(userSocket.keys()))
 
             io.emit("activities",Array.from(userActivitis.entries()))
+        })
+        socket.on("play-song",async(song1)=>{
+            console.log("Se escucha",song1)
+            const songFromDB = await Song.findById(song1?._id);
+            //para todos
+            io.emit("song-playing",songFromDB)    
         })
         socket.on('update_activity',({userID,activity})=>{
             userActivitis.set(userID,activity)
