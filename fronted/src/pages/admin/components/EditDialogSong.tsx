@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { axiosInstance } from '@/lib/axios'
 import { useMusicStore } from '@/store/useMusicStore'
 import { Upload } from 'lucide-react'
@@ -12,7 +13,7 @@ import { useParams } from 'react-router-dom'
 
 export default function EditDialogSong() {
     const {id}=useParams()
-    const {song,fecthShowSong}=useMusicStore()
+    const {song,fecthShowSong,albums}=useMusicStore()
     useEffect(()=>{
         fecthShowSong(id)
     },[])
@@ -23,13 +24,14 @@ export default function EditDialogSong() {
         title:"",
         artist:"",
         duration:"",
-        albumid:"",
+        albumID:"",
         genero:"",
         releaseYear:"",
         tags:"",
         mood:"",
         imagen:"",
-        audio:""
+        audio:"",
+        videoURL:""
         
     })
     
@@ -39,13 +41,14 @@ export default function EditDialogSong() {
         title:song?.title||"",
         artist:song?.artist||"",
         duration:song?.duration||"",
-        albumid:song?.albumid||"",
+        albumID:song?.albumID||"",
         genero:song?.genero||"",
         releaseYear:song?.releaseYear||"",
         tags:song?.tags||"",
         mood:song?.mood||"",
         imagen:song?.imageURL||"",
-        audio:song?.audioURL||""       
+        audio:song?.audioURL||"",
+        videoURL:song?.videoURL||""       
     })
     //console.log(editSong)
         
@@ -56,13 +59,14 @@ export default function EditDialogSong() {
 
     
     
-    const [files, setfiles] = useState<{audio:File|null,image:File|null}>({
+    const [files, setfiles] = useState<{audio:File|null,image:File|null,video:File|null}>({
         audio:null,
-        image:null
+        image:null,
+        video:null
       })
     const audioInputRef=useRef<HTMLInputElement>(null)
     const imageInputRef=useRef<HTMLInputElement>(null)  
-    
+    const videorInputRef=useRef<HTMLInputElement>(null)
     const handleSubmit=async()=>{
         //console.log(song)
         setisloading(true)
@@ -74,11 +78,12 @@ export default function EditDialogSong() {
             formData.append("title",editSong.title)
             formData.append("artist",editSong.artist)
             formData.append("duration",String(editSong.duration))
-            if(editSong.albumid && editSong.albumid!=="none"){
-                formData.append("albumID",editSong.albumid)
+            if(editSong.albumID && editSong.albumID!=="none"){
+                formData.append("albumID",editSong.albumID)
             }
             formData.append("imageFile",files.image)
             formData.append("audioFile",files.audio)
+            formData.append("videoFile",files.video)
             formData.append("releaseYear",editSong.releaseYear)
             formData.append("genero",editSong.genero)
             formData.append("tags",editSong.tags)
@@ -107,7 +112,11 @@ export default function EditDialogSong() {
                  ref={audioInputRef}
                  hidden 
                  onChange={(e)=>setfiles((prev)=>({...prev,audio:e.target.files![0]}))} />
-            
+                <input type="file" accept='video/*'
+                        ref={videorInputRef} 
+                        hidden
+                        onChange={(e)=>setfiles((prev)=>({...prev,video:e.target.files![0]}))}
+                />    
                 <input type="file" accept='image/*'
                  ref={imageInputRef} 
                  hidden
@@ -156,6 +165,19 @@ export default function EditDialogSong() {
                     </Button>
                 </div>
             </div>
+            {/*Diseño de video */}
+             <div className="space-y-2">
+                <label htmlFor="" className='text-sm font-medium'>Video File</label>
+                <div className="flex items-center gap-2">
+                    <Button variant={'outline'} onClick={()=>videorInputRef.current?.click()} className='w-full'>
+                        {files.video
+                        ?files.video.name.slice(0,20)
+                        :editSong.videoURL
+                        ? "Video existente"
+                        :"Seleccionar Video de Fondo"}
+                    </Button>
+                </div>
+            </div>
              <div className="space-y-2">
                     <label className='text-sm font-medium'>Titulo</label>
                     <Input value={editSong.title} onChange={(e)=>seteditSong({...editSong,title:e.target.value})}
@@ -193,8 +215,30 @@ export default function EditDialogSong() {
                     <label className='text-sm font-medium'>Mood</label>
                     <Input className='bg-zinc-800 border-zinc-700' value={editSong.mood}
                     onChange={(e)=>seteditSong({...editSong,mood:e.target.value})}></Input>
-                </div>                          
-            <Button variant={'outline'} onClick={()=>setopenDialog(false)} disabled={isloading}>Cancelar</Button>
+                </div>
+            <div className="space-y-2">
+                    <label className='text-sm font-medium'>Album ID</label>
+                    <Select
+                     value={editSong.albumID}
+                     onValueChange={(v)=>seteditSong({...editSong,albumID:v})}>
+                        <SelectTrigger className='bg-zinc-800  border-zinc-700'>
+                            <SelectValue placeholder='Seleccionar Album'></SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className='bg-zinc-800 h-100  border-zinc-700'>                            
+                            <SelectItem value='none'>No album</SelectItem>
+                            {albums.map((a)=>(
+                                <SelectItem key={a._id} value={a._id}>
+                                    <div className="flex flex-row gap-2 items-center">
+                                        <img src={a.imageUrl} className='w-8 h-8 rounded-full object-cover' alt="" />
+                                        <p>{a.title}</p>
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select> 
+                   
+                </div>                              
+        <Button variant={'outline'} onClick={()=>setopenDialog(false)} disabled={isloading}>Cancelar</Button>
         <Button onClick={handleSubmit} disabled={isloading}>
             {isloading?"Actualizando cancion...":"Actualizar cancion"}
         </Button>        
