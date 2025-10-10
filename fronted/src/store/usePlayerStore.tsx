@@ -1,6 +1,9 @@
 import {create} from "zustand"
 import type { Song } from "../types"
 import { useChatStore } from "./useChatStore"
+import { axiosInstance } from "@/lib/axios"
+
+
 interface PlayerStore{
     currentSong:Song|null
     isPlaying:boolean
@@ -19,13 +22,15 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
     queue:[],
     currenIndex:-1,
     initializeQueue:(songs:Song[])=>{
+        
         set({
             queue:songs,
             currentSong:get().currentSong||songs[0],
             currenIndex:get().currenIndex==-1?0:get().currenIndex
         })
+        
     },
-    playAlbum:(songs:Song[],startIndex=0)=>{
+    playAlbum:async(songs:Song[],startIndex=0)=>{
         if(songs.length===0) return;
         const song=songs[startIndex]
         const sokect=useChatStore.getState().socket
@@ -34,13 +39,26 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
                 userID:sokect.auth.userId,
                 activity:`Escuchando ${song.title} by ${song.artist}`
             })
+                
         }
         set({
             queue:songs,
             currentSong:song,
             currenIndex:startIndex,
             isPlaying:true
-        }) 
+        })
+        console.log("cancion que se emite del album")
+        sokect.emit("play-song",song)
+        if(song){
+            console.log("Cancion que escucha actualmente de playAlbum:", song.title)
+            await axiosInstance.post("/admin/reproducir/s",{
+                user_ID:sokect.auth.userId,
+                song_ID:song._id,
+                liked:false
+
+            })            
+            
+        } 
 
     },
     setCurrentSong:(song:Song|null)=>{
@@ -57,9 +75,10 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
             currentSong:song,
             isPlaying:true,
             currenIndex:songIndex!==-1 ? songIndex : get().currenIndex            
-        }) 
+        })
+        sokect.emit("play-song",song) 
     },
-    togglePlay:()=>{
+    togglePlay:async()=>{
         const startplay=!get().isPlaying
         const currentSong=get().currentSong
         const sokect=useChatStore.getState().socket
@@ -68,10 +87,23 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
                 userID:sokect.auth.userId,
                 activity:startplay && currentSong? `Escuchando ${currentSong.title} by ${currentSong.artist}`:"Idle"
             })
+            
+            //-------------
         }
         set({isPlaying:startplay})
+        if(startplay&&currentSong){
+        console.log("Cancion que escucha actualmente es de toggle play:", currentSong.title)
+        await axiosInstance.post(`/admin/reproducir/s`,{
+            user_ID:sokect.auth.userId,
+            song_ID:currentSong._id,
+            liked:false
+        })
+        console.log("mostrar imagen")
+        sokect.emit("play-song",currentSong)
+
+    }
     },
-    playNext:()=>{
+    playNext:async()=>{
         const {currenIndex,queue}=get()
         const nextIndex=currenIndex+1
         if(nextIndex<queue.length){
@@ -88,6 +120,13 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
                 currenIndex:nextIndex,
                 isPlaying:true
             })
+            console.log("Se ejecuta el siguiente",nextSong.title)
+            await axiosInstance.post("/admin/reproducir/s",{
+                user_ID:sokect.auth.userId,
+                song_ID:nextSong._id,
+                liked:false
+            })
+            sokect.emit("play-song",nextSong)
         }else{
             set({
                 isPlaying:false
@@ -101,7 +140,7 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
             }
         }
     },
-    playPrevious:()=>{
+    playPrevious:async()=>{
         const {currenIndex,queue}=get()
         const preIndex=currenIndex-1
         if(preIndex>=0){
@@ -118,6 +157,13 @@ export const usePlayerStore=create<PlayerStore>((set,get)=>({
                 currentSong:preSong,
                 isPlaying:true
             })
+            console.log("Se ejecuta el previos",preSong.title)
+            await axiosInstance.post("/admin/reproducir/s",{
+                user_ID:sokect.auth.userId,
+                song_ID:preSong._id,
+                liked:false
+            })
+            sokect.emit("play-song",preSong)
         }else{
             set({isPlaying:false})
             const sokect=useChatStore.getState().socket
