@@ -1,5 +1,6 @@
 
 import { axiosInstance } from "@/lib/axios"
+import axios from "axios"
 import {create} from "zustand"
 
 interface HomeStore{
@@ -21,8 +22,10 @@ export const useHomeStore=create<HomeStore>((set)=>({
     fetchSongRecomend:async(id)=>{
         set({isloading:true,error:null})
         try{
-            const {data}=await axiosInstance.get(`/song/similar/${id}`)
-            set({songRecomen:data})
+            //const {data}=await axiosInstance.get(`/song/similar/${id}`)
+            const {data}=await axios.get(`http://127.0.0.1:8000/recommend/${id}`)//modelo Recomendacion
+            //console.log(data.similar)
+            set({songRecomen:data.similar})
         }catch(err){
             set({error:err})
         }finally{
