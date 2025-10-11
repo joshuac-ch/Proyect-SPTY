@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import { axiosInstance } from '../lib/axios'
 import type { Album, Song, Stats } from '../types';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 interface MusicStore{
     songs:Song[]
     albums:Album[]
@@ -17,7 +18,7 @@ interface MusicStore{
     //
     fecthShowSong:(id:string)=>Promise<void>;
     song:Song[]
-    
+    albumSpecific:Any[],
     fetchAlbums:()=>Promise<void>;
     fetchAbumsById:(id:string)=>Promise<void>;
     fetchFeatureSongs:()=>Promise<void>
@@ -27,10 +28,11 @@ interface MusicStore{
     fecthStat:()=>Promise<void>
     deleteSong:(id:string)=>Promise<void>
     deleteAlbum:(id:string)=>Promise<void>
-    
+    fechtAlbumSpecific:(id:string)=>Promise<void>
 }
 export const useMusicStore=create<MusicStore>((set)=>({
   albums:[],
+  albumSpecific:[],
   songs:[],
   song:[],
   isLoading:false,
@@ -44,6 +46,17 @@ export const useMusicStore=create<MusicStore>((set)=>({
     totalSonsg:0,
     totalUsers:0,
     totalArtist:0
+  },
+  fechtAlbumSpecific:async(id)=>{
+    set({error:null,isLoading:true})
+    try{
+        const {data}=await axiosInstance.get(`/album/g/${id}`)
+        set({albumSpecific:data})
+    }catch(err){    
+        set({error:err})
+    }finally{
+        set({isLoading:false})
+    }
   },
   fecthShowSong:async(id)=>{
     set({error:null,isLoading:true})
