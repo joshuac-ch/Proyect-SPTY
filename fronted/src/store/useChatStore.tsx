@@ -67,7 +67,9 @@ export const useChatStore=create<ChatStore>((set,get)=>({
             socket.on("users_online",(users:string[])=>{
                 set({onlineUsers:new Set(users)})
             })
-            
+            socket.on("song-playing",(song)=>{                
+                set({songData:song})
+            })
             socket.on("activities",(userID:[string,string][])=>{
                 set({userActivitys:new Map(userID)})
             })
@@ -97,10 +99,7 @@ export const useChatStore=create<ChatStore>((set,get)=>({
                     messages:[...s.messages,message]
                 }))
             })
-            socket.on("song-playing",(song)=>{
-                
-                set({songData:song})
-            })
+            
             socket.on('activity_updated',({userID,activity})=>{
                 set((s)=>{
                     const newActivities=new Map(s.userActivitys)
