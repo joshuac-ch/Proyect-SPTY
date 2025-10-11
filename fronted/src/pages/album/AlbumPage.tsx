@@ -1,17 +1,37 @@
-import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { useMusicStore } from '../../store/useMusicStore'
 import { ScrollArea } from '../../components/ui/scroll-area'
 import { Button } from '../../components/ui/button'
 import { Clock, Music, Pause, Play } from 'lucide-react'
 import { usePlayerStore } from '../../store/usePlayerStore'
 
+import {FastAverageColor} from "fast-average-color"
 export const FormatDuration=(seg:number)=>{
     const minutes=Math.floor(seg / 60)
     const remainginSecons=seg % 60
     return `${minutes}:${remainginSecons.toString().padStart(2,"0")}`
   }
 export default function AlbumPage() {
+  const imageref=useRef<HTMLImageElement>(null)
+    const [backgrond, setbackgrond] = useState("#a09f9f")
+    const handleImageLoad=()=>{
+      if(!imageref.current)return;
+       const fac=new FastAverageColor()
+      fac.getColorAsync(imageref.current)
+      .then(color => {
+        // color.hex -> color en hexadecimal
+        // color.rgb -> color en rgb
+        document.body.style.backgroundColor = color.hex;
+        setbackgrond(color.hex)
+        console.log("exito el color es",color.hex)
+      })
+      
+      .catch(e => {
+        console.log("Error al obtener color:", e);
+      });
+    }
+    
   const {albumID}=useParams()
   const {fetchAbumsById,currentAlbum,isLoading}=useMusicStore()
   const {currentSong,isPlaying,playAlbum,togglePlay}=usePlayerStore()
@@ -39,15 +59,15 @@ export default function AlbumPage() {
    <div className="h-full ">
     <ScrollArea className='h-full rounded-md'>
         <div className='relative min-h-full'>
-            <div className='absolute inset-0 bg-gradient-to-b from-[#5038a0]/80 via-zinc-900/80
-            to-zinc-900 pointer-events-none'
-            aria-hidden='true'>
+            <div className={`absolute inset-0 pointer-events-none`}
+            aria-hidden='true'
+            style={{backgroundImage: `linear-gradient(to bottom, ${backgrond}cc, rgba(24,24,27,0.8), rgba(24,24,27,1))`}}>
 
             </div>
             {/*Content*/}
             <div className='relative z-10'>
                 <div className='flex p-6 gap-6 pb-8'>
-                    <img src={`${currentAlbum?.imageUrl}`}  alt={`${currentAlbum?.title}`}
+                    <img src={`${currentAlbum?.imageUrl}`} crossOrigin="anonymous" ref={imageref} onLoad={handleImageLoad}  alt={`${currentAlbum?.title}`}
                     className='w-[240px] h-[240px] shadow-xl rounded'/>
                     <div className='flex flex-col justify-end'>
                         <p className='text-sm font-medium '>
@@ -95,13 +115,50 @@ export default function AlbumPage() {
                                     const iscurrentSong=currentSong?._id===s._id
                                     return(            
                                         <div  
-                                        onClick={()=>handlePlaySong(i)}
+                                        onClick={()=>handlePlaySong(i)} 
                                         className='grid grid-cols-[16px_4fr_2fr_1fr] gap-4 px-4 py-2 text-sm 
-                                        text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer'
+                                        text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer '
                                          key={i}>
-                                            <div  className='flex items-center justify-center'>
+                                            <div className='flex items-center justify-center'>
                                                {iscurrentSong && isPlaying?(
-                                                <div className='size-4 text-green-500'><Music className='size-4'></Music></div>
+                                                <div className="flex items-end gap-0.5 h-max-6">
+                                                    <div
+                                                        className="w-0.5 bg-green-500 h-3"
+                                                        style={{
+                                                        animation: "pulseBar 0.8s ease-in-out infinite",
+                                                        transformOrigin: "bottom",
+                                                        }}
+                                                    ></div>
+                                                    <div
+                                                        className="w-0.5 bg-green-500 h-2"
+                                                        style={{
+                                                        animation: "pulseBar 1s ease-in-out infinite",
+                                                        transformOrigin: "bottom",
+                                                        }}
+                                                    ></div>
+                                                    <div
+                                                        className="w-0.5 bg-green-500 h-6"
+                                                        style={{
+                                                        animation: "pulseBar 0.7s ease-in-out infinite",
+                                                        transformOrigin: "bottom",
+                                                        }}
+                                                    ></div>
+                                                    <div
+                                                        className="w-0.5 bg-green-500 h-5"
+                                                        style={{
+                                                        animation: "pulseBar 0.6s ease-in-out infinite",
+                                                        transformOrigin: "bottom",
+                                                        }}
+                                                    ></div>
+                                                     <div
+                                                        className="w-0.5 bg-green-500 h-4"
+                                                        style={{
+                                                        animation: "pulseBar 0.8s ease-in-out infinite",
+                                                        transformOrigin: "bottom",
+                                                        }}
+                                                    ></div>
+                                                    </div>
+
                                                ):(
                                                  <span className='group-hover:hidden'>{i+1}</span>
                                                )}
@@ -112,7 +169,7 @@ export default function AlbumPage() {
                                             <div className='flex items-center gap-3'>
                                                 <img src={`${s.imageURL}`} className='size-10' alt="" />                                                
                                                 <div>
-                                                    <div className='font-medium text-white'>{s.title}</div>
+                                                    <div className='font-medium text-white hover:text-green-500'><Link to={`/song/s/${s._id}`}>{s.title}</Link></div>
                                                     <div>{s.artist}</div>
                                                 </div>                                                
                                             </div>
